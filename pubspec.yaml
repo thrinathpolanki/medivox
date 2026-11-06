@@ -1,0 +1,74 @@
+name: medivox
+description: Healthcare That Speaks Your Language.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management & Routing
+  flutter_riverpod: ^3.4.3
+  go_router: ^18.1.2
+
+  # Database & Storage
+  drift: ^2.16.0
+  sqlite3_flutter_libs: ^0.5.40
+  shared_preferences: ^2.2.2
+  flutter_secure_storage: ^11.2.0
+  path_provider: ^2.1.2
+  path: ^1.9.0
+
+  # Firebase (Google Mode)
+  firebase_core: ^5.1.0
+  firebase_auth: ^7.0.1
+  google_sign_in: ^7.2.0
+  cloud_firestore: ^7.1.0
+  firebase_storage: ^14.0.1
+
+  # Media, AI & OCR
+  camera: ^0.12.2
+  image_picker: ^1.0.7
+  google_mlkit_text_recognition: ^0.17.1
+
+  # Notifications & Voice
+  flutter_local_notifications: ^22.3.3
+  timezone: ^0.11.2
+  flutter_tts: ^4.0.2
+  speech_to_text: ^7.5.0
+
+  # Utilities
+  permission_handler: ^13.0.2
+  connectivity_plus: ^7.3.2
+  uuid: ^4.3.3
+  intl: any
+  
+  # Phase 3 Additions
+  image: ^4.1.7
+  crypto: ^3.0.3
+  tflite_flutter: ^0.12.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  drift_dev: ^2.16.0
+  build_runner: ^2.4.8
+  analyzer: ^14.7.0
+
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    - assets/models/mobilenet_v1.tflite
+
+hooks:
+  user_defines:
+    sqlite3:
+      source: system
