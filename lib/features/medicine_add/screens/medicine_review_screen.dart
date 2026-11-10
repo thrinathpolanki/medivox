@@ -1,14 +1,18 @@
 import 'dart:convert';
+
 import '../../../core/widgets/saving_overlay.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../medicine_scan/services/image_recognition_service.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../database/daos/medicine_dao_provider.dart';
 import '../registration_state.dart';
 import '../services/image_storage_service.dart';
+import '../../reminders/services/reminder_provider.dart';
 
 class MedicineReviewScreen extends ConsumerStatefulWidget {
   const MedicineReviewScreen({super.key});
@@ -78,8 +82,9 @@ class _MedicineReviewScreenState extends ConsumerState<MedicineReviewScreen> {
 
           // NEW: Generate AI embedding and save it
           try {
-            final embedding =
-                await ImageRecognitionService.generateEmbedding(file);
+            final embedding = await ImageRecognitionService.generateEmbedding(
+              file,
+            );
             await dao.insertEmbedding(
               medicineId: medicineId,
               imageId: imageId,
@@ -87,7 +92,8 @@ class _MedicineReviewScreenState extends ConsumerState<MedicineReviewScreen> {
             );
           } catch (e) {
             debugPrint(
-                'Failed to generate embedding: $e'); // Don't crash the whole save if AI fails
+              'Failed to generate embedding: $e',
+            ); // Don't crash the whole save if AI fails
           }
         }
       }
@@ -135,8 +141,9 @@ class _MedicineReviewScreenState extends ConsumerState<MedicineReviewScreen> {
 
             // NEW: Generate AI embedding and save it
             try {
-              final embedding =
-                  await ImageRecognitionService.generateEmbedding(file);
+              final embedding = await ImageRecognitionService.generateEmbedding(
+                file,
+              );
               await dao.insertEmbedding(
                 medicineId: medicineId,
                 imageId: imageId,
@@ -144,7 +151,8 @@ class _MedicineReviewScreenState extends ConsumerState<MedicineReviewScreen> {
               );
             } catch (e) {
               print(
-                  'Failed to generate embedding: $e'); // Don't crash the whole save if AI fails
+                'Failed to generate embedding: $e',
+              ); // Don't crash the whole save if AI fails
             }
           }
         }
@@ -171,11 +179,16 @@ class _MedicineReviewScreenState extends ConsumerState<MedicineReviewScreen> {
       context.go('/add-medicine/saved');
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Save failed: $e')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Save failed: $e')));
     } finally {
       if (mounted) setState(() => _saving = false);
+    }
+
+    final savedMedicine = await dao.getMedicineById(medicineId);
+    if (savedMedicine != null) {
+      final scheduler = ref.read(reminderSchedulerProvider);
+      await scheduler.scheduleAllForMedicine(medicine: savedMedicine);
     }
   }
 
@@ -191,8 +204,10 @@ class _MedicineReviewScreenState extends ConsumerState<MedicineReviewScreen> {
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const Text('Medicine Information',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const Text(
+                'Medicine Information',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
               const SizedBox(height: 8),
               _row('Name', state.medicineName),
               _row('Generic', state.genericName),
@@ -202,20 +217,25 @@ class _MedicineReviewScreenState extends ConsumerState<MedicineReviewScreen> {
               _row('Type', state.medicineType),
               if (state.notes.isNotEmpty) _row('Notes', state.notes),
               const SizedBox(height: 16),
-              const Text('Photos',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const Text(
+                'Photos',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
               const SizedBox(height: 8),
               Text('${state.photoCount} photo(s) captured'),
               const SizedBox(height: 16),
-              const Text('Schedules',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const Text(
+                'Schedules',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
               const SizedBox(height: 8),
               ...state.schedules.map(
                 (s) => Card(
                   child: ListTile(
                     title: Text('${s.period.toUpperCase()} @ ${s.time}'),
                     subtitle: Text(
-                        '${s.dosage} • ${s.foodInstruction} • ${s.repeatDays.length} day(s)/week'),
+                      '${s.dosage} • ${s.foodInstruction} • ${s.repeatDays.length} day(s)/week',
+                    ),
                   ),
                 ),
               ),
@@ -227,7 +247,9 @@ class _MedicineReviewScreenState extends ConsumerState<MedicineReviewScreen> {
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.white),
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : const Text('Save Medicine'),
               ),
@@ -250,8 +272,10 @@ class _MedicineReviewScreenState extends ConsumerState<MedicineReviewScreen> {
         children: [
           SizedBox(
             width: 110,
-            child: Text(label,
-                style: const TextStyle(fontWeight: FontWeight.w600)),
+            child: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
           Expanded(child: Text(value)),
         ],
