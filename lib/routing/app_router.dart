@@ -1,7 +1,10 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../features/reminders/screens/todays_schedule_screen.dart';
 import '../features/onboarding/terms_screen.dart';
 import '../features/onboarding/splash_screen.dart';
 import '../features/onboarding/welcome_screen.dart';
@@ -30,31 +33,34 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/welcome', builder: (_, __) => const WelcomeScreen()),
       GoRoute(path: '/terms', builder: (_, __) => const TermsScreen()),
       GoRoute(
-          path: '/storage', builder: (_, __) => const StorageSelectionScreen()),
+        path: '/storage',
+        builder: (_, __) => const StorageSelectionScreen(),
+      ),
       GoRoute(
-          path: '/language',
-          builder: (_, __) => const LanguageSelectionScreen()),
+        path: '/language',
+        builder: (_, __) => const LanguageSelectionScreen(),
+      ),
       GoRoute(
-          path: '/accessibility',
-          builder: (_, __) => const AccessibilitySetupScreen()),
+        path: '/accessibility',
+        builder: (_, __) => const AccessibilitySetupScreen(),
+      ),
       GoRoute(
-          path: '/onboarding-complete',
-          builder: (_, __) => const OnboardingCompleteScreen()),
+        path: '/onboarding-complete',
+        builder: (_, __) => const OnboardingCompleteScreen(),
+      ),
 
       // Main
       GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
       GoRoute(
-          path: '/medicines', builder: (_, __) => const MyMedicinesScreen()),
+        path: '/medicines',
+        builder: (_, __) => const MyMedicinesScreen(),
+      ),
       GoRoute(
         path: '/medicines/:id',
-        builder: (_, state) => MedicineDetailScreen(
-          medicineId: state.pathParameters['id']!,
-        ),
+        builder: (_, state) =>
+            MedicineDetailScreen(medicineId: state.pathParameters['id']!),
       ),
-      GoRoute(
-        path: '/scan',
-        builder: (_, __) => const MedicineScanScreen(),
-      ),
+      GoRoute(path: '/scan', builder: (_, __) => const MedicineScanScreen()),
       GoRoute(
         path: '/scan/result',
         builder: (context, state) {
@@ -68,26 +74,37 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       // Add medicine flow
       GoRoute(
-          path: '/add-medicine',
-          builder: (_, __) => const MedicinePhotoCaptureScreen()),
+        path: '/add-medicine',
+        builder: (_, __) => const MedicinePhotoCaptureScreen(),
+      ),
       GoRoute(
-          path: '/add-medicine/info',
-          builder: (_, __) => const MedicineInformationScreen()),
+        path: '/add-medicine/info',
+        builder: (_, __) => const MedicineInformationScreen(),
+      ),
       GoRoute(
-          path: '/add-medicine/schedule',
-          builder: (_, __) => const MedicineScheduleSetupScreen()),
+        path: '/add-medicine/schedule',
+        builder: (_, __) => const MedicineScheduleSetupScreen(),
+      ),
       GoRoute(
-          path: '/add-medicine/review',
-          builder: (_, __) => const MedicineReviewScreen()),
+        path: '/add-medicine/review',
+        builder: (_, __) => const MedicineReviewScreen(),
+      ),
       GoRoute(
-          path: '/add-medicine/saved',
-          builder: (_, __) => const MedicineSavedScreen()),
+        path: '/add-medicine/saved',
+        builder: (_, __) => const MedicineSavedScreen(),
+      ),
 
       // Phase 4 placeholder
       GoRoute(
-          path: '/scan',
-          builder: (_, __) =>
-              const Scaffold(body: Center(child: Text('Scan (Phase 4)')))),
+        path: '/scan',
+        builder: (_, __) =>
+            const Scaffold(body: Center(child: Text('Scan (Phase 4)'))),
+      ),
+
+      GoRoute(
+        path: '/todays-schedule',
+        builder: (_, __) => const TodaysScheduleScreen(),
+      ),
     ],
   );
 });
