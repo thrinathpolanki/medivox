@@ -59,38 +59,22 @@ class HomeScreen extends StatelessWidget {
                   context,
                   "Today's Schedule",
                   Icons.calendar_today,
-                  () {
-                    // Phase 5
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Schedule coming in Phase 5')),
-                    );
-                  },
+                  () => context.push('/todays-schedule'),
                 ),
-                _buildActionCard(
-                  context,
-                  'Reminders',
-                  Icons.alarm,
-                  () {
-                    // Phase 5
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Reminders coming in Phase 5')),
-                    );
-                  },
-                ),
-                _buildActionCard(
-                  context,
-                  'Reports',
-                  Icons.bar_chart,
-                  () {
-                    // Phase 5
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Reports coming in Phase 5')),
-                    );
-                  },
-                ),
+                _buildActionCard(context, 'Reminders', Icons.alarm, () {
+                  // Phase 5
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Reminders coming in Phase 5'),
+                    ),
+                  );
+                }),
+                _buildActionCard(context, 'Reports', Icons.bar_chart, () {
+                  // Phase 5
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Reports coming in Phase 5')),
+                  );
+                }),
               ],
             ),
             const SizedBox(height: 24),
