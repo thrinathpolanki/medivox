@@ -1,8 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/constants/app_constants.dart';
+import '../reminders/services/reminder_provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _rescheduleOnOpen();
+  }
+
+  Future<void> _rescheduleOnOpen() async {
+    // Wait until after first frame so providers are ready
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString(AppConstants.prefUserId) ?? 'local-user';
+      final scheduler = ref.read(reminderSchedulerProvider);
+      // This ensures alarms are restored after reboot or app kill
+      await scheduler.scheduleAllMedicinesForUser(userId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,22 +85,28 @@ class HomeScreen extends StatelessWidget {
                   context,
                   "Today's Schedule",
                   Icons.calendar_today,
-                  () => context.push('/todays-schedule'),
+                  () => context.push('/todays-schedule'), // <-- Wired up to the new screen
                 ),
-                _buildActionCard(context, 'Reminders', Icons.alarm, () {
-                  // Phase 5
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Reminders coming in Phase 5'),
-                    ),
-                  );
-                }),
-                _buildActionCard(context, 'Reports', Icons.bar_chart, () {
-                  // Phase 5
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Reports coming in Phase 5')),
-                  );
-                }),
+                _buildActionCard(
+                  context,
+                  'Reminders',
+                  Icons.alarm,
+                  () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Reminders coming in Phase 6')),
+                    );
+                  },
+                ),
+                _buildActionCard(
+                  context,
+                  'Reports',
+                  Icons.bar_chart,
+                  () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Reports coming in Phase 6')),
+                    );
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 24),
@@ -83,7 +115,6 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // Phase 6
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Voice Assistant coming in Phase 6')),
           );
@@ -97,16 +128,12 @@ class HomeScreen extends StatelessWidget {
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(icon: Icon(Icons.camera_alt), label: 'Scan'),
-          NavigationDestination(
-            icon: Icon(Icons.medication),
-            label: 'Medicines',
-          ),
+          NavigationDestination(icon: Icon(Icons.medication), label: 'Medicines'),
           NavigationDestination(icon: Icon(Icons.more_horiz), label: 'More'),
         ],
         onDestinationSelected: (index) {
           switch (index) {
             case 0:
-              // Already on Home
               break;
             case 1:
               context.push('/scan');
@@ -116,7 +143,7 @@ class HomeScreen extends StatelessWidget {
               break;
             case 3:
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('More options coming in Phase 5')),
+                const SnackBar(content: Text('More options coming in Phase 6')),
               );
               break;
           }
@@ -155,18 +182,8 @@ class HomeScreen extends StatelessWidget {
 
   String _monthName(int month) {
     const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
     return months[month - 1];
   }
