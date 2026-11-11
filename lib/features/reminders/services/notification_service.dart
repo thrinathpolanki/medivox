@@ -1,9 +1,13 @@
 import 'dart:io';
 import 'dart:convert';
+
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+
+import '../../../database/app_database.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _plugin =
@@ -32,8 +36,10 @@ class NotificationService {
 
     // Request permissions on Android 13+
     if (Platform.isAndroid) {
-      final android = _plugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       await android?.requestNotificationsPermission();
       await android?.requestExactAlarmsPermission();
     }
@@ -42,15 +48,63 @@ class NotificationService {
   }
 
   @pragma('vm:entry-point')
-  static void _onNotificationTap(NotificationResponse response) {
-    // Payload is expected to be "medicineId|scheduleId"
-    // In Phase 5 we just note the tap. In Phase 6 we'll navigate to the schedule.
-    debugPrint('Notification tapped: ${response.payload} action: ${response.actionId}');
+  static void _onNotificationTap(NotificationResponse response) async {
+    await _handleAction(response);
   }
 
   @pragma('vm:entry-point')
-  static void _onBackgroundNotificationTap(NotificationResponse response) {
-    debugPrint('Background notification action: ${response.actionId}');
+  static void _onBackgroundNotificationTap(NotificationResponse response) async {
+    await _handleAction(response);
+  }
+
+  static Future<void> _handleAction(NotificationResponse response) async {
+    if (response.actionId == null || response.payload == null) return;
+
+    // Payload format: "medicineId|scheduleId|doseId"
+    final parts = response.payload!.split('|');
+    if (parts.length < 3) return;
+    final doseId = parts[2];
+
+    // Resolve the database (cannot use Riverpod in a background callback)
+    // Simplest approach: open a new AppDatabase instance
+    final db = AppDatabase();
+    try {
+      final now = DateTime.now();
+      switch (response.actionId) {
+        case 'taken':
+          await (db.update(db.doseHistory)..where((t) => t.doseId.equals(doseId)))
+              .write(DoseHistoryCompanion(
+            status: const Value('taken'),
+            actionAt: Value(now),
+          ));
+          break;
+        case 'skip':
+          await (db.update(db.doseHistory)..where((t) => t.doseId.equals(doseId)))
+              .write(DoseHistoryCompanion(
+            status: const Value('skipped'),
+            actionAt: Value(now),
+          ));
+          break;
+        case 'snooze':
+          final snoozeTime = now.add(const Duration(minutes: 10));
+          await (db.update(db.doseHistory)..where((t) => t.doseId.equals(doseId)))
+              .write(DoseHistoryCompanion(
+            status: const Value('snoozed'),
+            actionAt: Value(now),
+          ));
+          await NotificationService.scheduleReminder(
+            notificationId: doseId.hashCode & 0x7FFFFFFF,
+            scheduledAt: snoozeTime,
+            medicineName: 'Medicine',
+            dosage: 'your dose',
+            foodInstruction: 'as prescribed',
+            payload: response.payload!,
+          );
+          break;
+      }
+    } finally {
+      await db.close();
+    }
   }
 
   /// Schedule a single reminder. Idempotent for a given [doseId].
@@ -67,12 +121,14 @@ class NotificationService {
     // Do not schedule in the past
     if (scheduledAt.isBefore(DateTime.now())) return;
 
-    final foodText = {
-      'before_food': 'before food',
-      'after_food': 'after food',
-      'with_food': 'with food',
-      'as_prescribed': 'as prescribed',
-    }[foodInstruction] ?? foodInstruction;
+    final foodText =
+        {
+          'before_food': 'before food',
+          'after_food': 'after food',
+          'with_food': 'with food',
+          'as_prescribed': 'as prescribed',
+        }[foodInstruction] ??
+        foodInstruction;
 
     final androidDetails = AndroidNotificationDetails(
       channelId,
