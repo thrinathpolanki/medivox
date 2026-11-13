@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class SavingOverlay extends StatefulWidget {
   const SavingOverlay({super.key});
-
   @override
   State<SavingOverlay> createState() => _SavingOverlayState();
 }
