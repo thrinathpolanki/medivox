@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/constants/app_constants.dart';
 import '../reminders/services/reminder_provider.dart';
 
@@ -85,27 +86,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   context,
                   "Today's Schedule",
                   Icons.calendar_today,
-                  () => context.push('/todays-schedule'), // <-- Wired up to the new screen
+                  () => context.push(
+                    '/todays-schedule',
+                  ), // <-- Wired up to the new screen
                 ),
-                _buildActionCard(
-                  context,
-                  'Reminders',
-                  Icons.alarm,
-                  () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Reminders coming in Phase 6')),
-                    );
-                  },
-                ),
+                _buildActionCard(context, 'Reminders', Icons.alarm, () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Reminders coming in Phase 6'),
+                    ),
+                  );
+                }),
                 _buildActionCard(
                   context,
                   'Reports',
                   Icons.bar_chart,
-                  () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Reports coming in Phase 6')),
-                    );
-                  },
+                  () => context.push('/adherence'),
                 ),
               ],
             ),
@@ -128,7 +124,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(icon: Icon(Icons.camera_alt), label: 'Scan'),
-          NavigationDestination(icon: Icon(Icons.medication), label: 'Medicines'),
+          NavigationDestination(
+            icon: Icon(Icons.medication),
+            label: 'Medicines',
+          ),
           NavigationDestination(icon: Icon(Icons.more_horiz), label: 'More'),
         ],
         onDestinationSelected: (index) {
@@ -142,9 +141,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               context.push('/medicines');
               break;
             case 3:
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('More options coming in Phase 6')),
-              );
+              context.push('/caregiver');
               break;
           }
         },
@@ -182,8 +179,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   String _monthName(int month) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return months[month - 1];
   }
