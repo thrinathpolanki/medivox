@@ -24,6 +24,9 @@ import '../features/medicine_scan/screens/medicine_scan_screen.dart';
 import '../features/medicine_scan/screens/scan_result_screen.dart';
 import '../features/medicine_scan/services/matching_engine.dart';
 
+import '../features/adherence/screens/adherence_dashboard_screen.dart';
+import '../features/caregiver/screens/caregiver_mode_screen.dart';
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
@@ -104,6 +107,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/todays-schedule',
         builder: (_, __) => const TodaysScheduleScreen(),
+      ),
+
+      GoRoute(
+        path: '/adherence',
+        builder: (_, __) => const AdherenceDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/caregiver',
+        builder: (_, __) => const CaregiverModeScreen(),
       ),
     ],
   );
