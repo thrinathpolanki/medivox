@@ -13,7 +13,6 @@ class UserProfiles extends Table {
   @override
   Set<Column> get primaryKey => {userId};
 }
-
 // ─────────────────────────────────────────────────────────
 // 2. Medicines  (must come BEFORE tables that reference it)
 // ─────────────────────────────────────────────────────────
