@@ -25,7 +25,6 @@ class MissedDoseEngine {
         status: Value('missed'),
       ));
     }
-
     return stale.length;
   }
 }
