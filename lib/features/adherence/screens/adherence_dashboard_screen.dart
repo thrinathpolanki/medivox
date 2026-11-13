@@ -55,7 +55,6 @@ class _AdherenceDashboardScreenState
     if (data == null) return;
     final prefs = await SharedPreferences.getInstance();
     final lang = prefs.getString(AppConstants.prefLanguage) ?? 'en';
-
     final pct = (data.adherencePercent * 100).toStringAsFixed(0);
     final report = "Here is your adherence report for the last $_days days. "
         "You took ${data.totalTaken} doses. "
