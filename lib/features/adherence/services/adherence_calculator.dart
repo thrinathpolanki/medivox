@@ -33,7 +33,6 @@ class OverallAdherence {
   final int totalSkipped;
   final int totalPending;
   final List<DailyAdherence> daily;
-
   const OverallAdherence({
     required this.totalTaken,
     required this.totalMissed,
