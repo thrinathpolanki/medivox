@@ -2,7 +2,6 @@
 
 part of 'app_database.dart';
 
-// ignore_for_file: type=lint
 class $UserProfilesTable extends UserProfiles
     with TableInfo<$UserProfilesTable, UserProfile> {
   @override
