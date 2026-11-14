@@ -5,7 +5,6 @@ import 'notification_service.dart';
 class ReminderScheduler {
   final AppDatabase db;
   final _uuid = const Uuid();
-
   ReminderScheduler(this.db);
 
   /// Schedule all reminders for all schedules of the given medicine.
