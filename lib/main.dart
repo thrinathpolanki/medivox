@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:drift/drift.dart';
-
 import 'app.dart';
 import 'core/constants/app_constants.dart';
 import 'features/reminders/services/notification_service.dart';
