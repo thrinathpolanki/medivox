@@ -88,7 +88,6 @@ class ReminderScheduler {
     final schedules = await (db.select(db.medicationSchedules)
           ..where((t) => t.medicineId.equals(medicineId)))
         .get();
-
     for (final schedule in schedules) {
       final doses = await (db.select(db.doseHistory)
             ..where((t) => t.scheduleId.equals(schedule.scheduleId)))
