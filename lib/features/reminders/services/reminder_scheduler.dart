@@ -51,7 +51,6 @@ class ReminderScheduler {
       
       // Check if this date's weekday is enabled
       if (!repeatDays.contains(date.weekday)) continue;
-
       final scheduledAt =
           DateTime(date.year, date.month, date.day, hour, minute);
       if (scheduledAt.isBefore(now)) continue;
