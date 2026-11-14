@@ -47,7 +47,6 @@ class ReminderScheduler {
     final now = DateTime.now();
     for (int dayOffset = 0; dayOffset < daysAhead; dayOffset++) {
       final date = DateTime(now.year, now.month, now.day + dayOffset);
-      
       // Check if this date's weekday is enabled
       if (!repeatDays.contains(date.weekday)) continue;
       final scheduledAt =
