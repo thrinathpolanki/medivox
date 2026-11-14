@@ -38,7 +38,6 @@ class ReminderScheduler {
     int daysAhead,
   ) async {
     if (!schedule.enabled) return;
-
     // Parse repeatDays (JSON list like "[1,2,3,4,5,6,7]" — 1=Mon, 7=Sun)
     final List<int> repeatDays = (jsonDecodeList(schedule.repeatDays));s
     final timeParts = schedule.time.split(':');
