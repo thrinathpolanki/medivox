@@ -44,7 +44,6 @@ class ReminderScheduler {
     if (timeParts.length != 2) return;
     final hour = int.tryParse(timeParts[0]) ?? 0;
     final minute = int.tryParse(timeParts[1]) ?? 0;
-
     final now = DateTime.now();
     for (int dayOffset = 0; dayOffset < daysAhead; dayOffset++) {
       final date = DateTime(now.year, now.month, now.day + dayOffset);
