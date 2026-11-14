@@ -53,7 +53,6 @@ class ReminderScheduler {
       final scheduledAt =
           DateTime(date.year, date.month, date.day, hour, minute);
       if (scheduledAt.isBefore(now)) continue;
-
       // Create dose history record (status = 'pending')
       final doseId = _uuid.v4();
       await db.into(db.doseHistory).insert(
