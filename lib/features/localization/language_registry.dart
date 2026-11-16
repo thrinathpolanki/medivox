@@ -1,167 +1,58 @@
-class LanguageCapability {
-  final String code;
-  final String nativeName;
-  final String englishName;
-  final bool uiTranslated;
-  final bool ttsAvailable;
-  final bool ocrAvailable;
-  final bool speechRecognitionAvailable;
-  final bool isRTL;
+enum Capability { available, unverified, unavailable }
 
-  const LanguageCapability({
-    required this.code,
-    required this.nativeName,
-    required this.englishName,
-    this.uiTranslated = false,
-    this.ttsAvailable = false,
-    this.ocrAvailable = false,
-    this.speechRecognitionAvailable = false,
-    this.isRTL = false,
+class LanguageInfo {
+  const LanguageInfo(
+    this.code,
+    this.englishName,
+    this.nativeName, {
+    this.rtl = false,
+    this.ui = Capability.unavailable,
   });
+  final String code;
+  final String englishName;
+  final String nativeName;
+  final bool rtl;
+
+  /// Only UI translation status is tracked in M1. Font/OCR/TTS/speech/offline
+  /// capabilities start as "unverified" and are filled in only after device
+  /// testing (Milestone 4). Do NOT mark anything available without testing.
+  final Capability ui;
+  Capability get font => Capability.unverified;
+  Capability get ocr => Capability.unverified;
+  Capability get tts => Capability.unverified;
+  Capability get speechRecognition => Capability.unverified;
+  Capability get offline => Capability.unverified;
 }
 
-class LanguageRegistry {
-  static const List<LanguageCapability> all = [
-    LanguageCapability(
-      code: 'en',
-      nativeName: 'English',
-      englishName: 'English',
-      uiTranslated: true,
-      ttsAvailable: true,
-      ocrAvailable: true,
-      speechRecognitionAvailable: true,
-    ),
-    LanguageCapability(
-      code: 'hi',
-      nativeName: 'हिन्दी',
-      englishName: 'Hindi',
-      uiTranslated: true,
-      ttsAvailable: true,
-      ocrAvailable: true,
-      speechRecognitionAvailable: true,
-    ),
-    LanguageCapability(
-      code: 'te',
-      nativeName: 'తెలుగు',
-      englishName: 'Telugu',
-      uiTranslated: true,
-      ttsAvailable: true,
-      ocrAvailable: true,
-    ),
-    LanguageCapability(
-      code: 'ta',
-      nativeName: 'தமிழ்',
-      englishName: 'Tamil',
-      uiTranslated: true,
-      ttsAvailable: true,
-      ocrAvailable: true,
-    ),
-    LanguageCapability(
-      code: 'kn',
-      nativeName: 'ಕನ್ನಡ',
-      englishName: 'Kannada',
-      uiTranslated: true,
-      ttsAvailable: true,
-    ),
-    LanguageCapability(
-      code: 'ml',
-      nativeName: 'മലയാളം',
-      englishName: 'Malayalam',
-      uiTranslated: true,
-      ttsAvailable: true,
-    ),
-    LanguageCapability(
-      code: 'gu',
-      nativeName: 'ગુજરાતી',
-      englishName: 'Gujarati',
-      uiTranslated: true,
-      ttsAvailable: true,
-    ),
-    LanguageCapability(
-      code: 'pa',
-      nativeName: 'ਪੰਜਾਬੀ',
-      englishName: 'Punjabi',
-      uiTranslated: true,
-      ttsAvailable: true,
-    ),
-    LanguageCapability(
-      code: 'bn',
-      nativeName: 'বাংলা',
-      englishName: 'Bengali',
-      uiTranslated: true,
-      ttsAvailable: true,
-      ocrAvailable: true,
-    ),
-    LanguageCapability(
-      code: 'mr',
-      nativeName: 'मराठी',
-      englishName: 'Marathi',
-      uiTranslated: true,
-      ttsAvailable: true,
-    ),
-    LanguageCapability(
-      code: 'ur',
-      nativeName: 'اردو',
-      englishName: 'Urdu',
-      uiTranslated: true,
-      ttsAvailable: true,
-      isRTL: true,
-    ),
-    LanguageCapability(
-      code: 'or',
-      nativeName: 'ଓଡ଼ିଆ',
-      englishName: 'Odia',
-      uiTranslated: true,
-    ),
-    LanguageCapability(
-      code: 'as',
-      nativeName: 'অসমীয়া',
-      englishName: 'Assamese',
-      uiTranslated: true,
-    ),
-    LanguageCapability(
-      code: 'sa',
-      nativeName: 'संस्कृतम्',
-      englishName: 'Sanskrit',
-    ),
-    LanguageCapability(
-      code: 'kok',
-      nativeName: 'कोंकणी',
-      englishName: 'Konkani',
-    ),
-    LanguageCapability(
-      code: 'mai',
-      nativeName: 'मैथिली',
-      englishName: 'Maithili',
-    ),
-    LanguageCapability(code: 'ne', nativeName: 'नेपाली', englishName: 'Nepali'),
-    LanguageCapability(
-      code: 'sd',
-      nativeName: 'سنڌي',
-      englishName: 'Sindhi',
-      isRTL: true,
-    ),
-    LanguageCapability(code: 'doi', nativeName: 'डोगरी', englishName: 'Dogri'),
-    LanguageCapability(code: 'brx', nativeName: 'बड़ो', englishName: 'Bodo'),
-    LanguageCapability(
-      code: 'mni',
-      nativeName: 'মৈতৈলোন্',
-      englishName: 'Manipuri',
-    ),
-    LanguageCapability(
-      code: 'sat',
-      nativeName: 'ᱥᱟᱱᱛᱟᱲᱤ',
-      englishName: 'Santali',
-    ),
-    LanguageCapability(
-      code: 'ks',
-      nativeName: 'کٲشُر',
-      englishName: 'Kashmiri',
-      isRTL: true,
-    ),
-  ];
+const supportedLanguages = <LanguageInfo>[
+  LanguageInfo('en', 'English', 'English', ui: Capability.available),
+  LanguageInfo('as', 'Assamese', 'অসমীয়া'),
+  LanguageInfo('bn', 'Bengali', 'বাংলা'),
+  LanguageInfo('brx', 'Bodo', 'बड़ो'),
+  LanguageInfo('doi', 'Dogri', 'डोगरी'),
+  LanguageInfo('gu', 'Gujarati', 'ગુજરાતી'),
+  LanguageInfo('hi', 'Hindi', 'हिन्दी'),
+  LanguageInfo('kn', 'Kannada', 'ಕನ್ನಡ'),
+  LanguageInfo('ks', 'Kashmiri', 'کٲشُر', rtl: true),
+  LanguageInfo('kok', 'Konkani', 'कोंकणी'),
+  LanguageInfo('mai', 'Maithili', 'मैथिली'),
+  LanguageInfo('ml', 'Malayalam', 'മലയാളം'),
+  LanguageInfo('mni', 'Manipuri (Meitei)', 'ꯃꯤꯇꯩꯂꯣꯟ'),
+  LanguageInfo('mr', 'Marathi', 'मराठी'),
+  LanguageInfo('ne', 'Nepali', 'नेपाली'),
+  LanguageInfo('or', 'Odia', 'ଓଡ଼ିଆ'),
+  LanguageInfo('pa', 'Punjabi', 'ਪੰਜਾਬੀ'),
+  LanguageInfo('sa', 'Sanskrit', 'संस्कृतम्'),
+  LanguageInfo('sat', 'Santali', 'ᱥᱟᱱᱛᱟᱲᱤ'),
+  LanguageInfo('sd', 'Sindhi', 'سنڌي', rtl: true),
+  LanguageInfo('ta', 'Tamil', 'தமிழ்'),
+  LanguageInfo('te', 'Telugu', 'తెలుగు'),
+  LanguageInfo('ur', 'Urdu', 'اردو', rtl: true),
+];
 
-  static LanguageCapability getByCode(String code) {
-    return all.firstWhere((l) => l.code == code, orElse: () => all.first);
+LanguageInfo? languageByCode(String? code) {
+  for (final l in supportedLanguages) {
+    if (l.code == code) return l;
   }
+  return null;
 }
