@@ -1,17 +1,26 @@
-# Medivox
+# MediVox (Milestone 1)
 
-A new Flutter project.
+## Setup
+This folder holds the Dart source only. Generate the Android shell first:
 
-## Getting Started
+    cd medivox
+    flutter create . --org com.trimitha --project-name medivox --platforms android
+    flutter pub get
+    dart format .
+    flutter analyze
+    flutter test
+    flutter run
 
-This project is a starting point for a Flutter application.
+`flutter create .` keeps existing `lib/`, `test/` and `pubspec.yaml`.
+If it overwrites `lib/main.dart` or `test/widget_test.dart`, restore main.dart
+from this project and delete the generated `test/widget_test.dart`.
 
-A few resources to get you started if this is your first Flutter project:
+Package versions are caret ranges and have not been resolved yet. If pub
+reports conflicts, run `flutter pub upgrade --major-versions` and fix any API
+changes (most likely `go_router`).
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Rules enforced so far
+- Firebase is not a dependency and is never initialised (Local mode safe).
+- Storage mode is saved only after a local profile is created or Google sign-in succeeds.
+- Onboarding is never shown again once completed; connectivity is never checked.
+- No Android permissions are requested during onboarding.
