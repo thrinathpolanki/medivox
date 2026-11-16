@@ -1,35 +1,72 @@
 import 'package:flutter/material.dart';
 
-class AppTheme {
-  static const Color primaryTeal = Color(0xFF159B9B);
-  static const Color deepNavy = Color(0xFF102C50);
-  static const Color lightBackground = Color(0xFFF5F8FA);
+class AppColors {
+  static const teal = Color(0xFF159B9B);
+  static const navy = Color(0xFF102C50);
+  static const lightBackground = Color(0xFFF5F8FA);
+  static const success = Color(0xFF249B65);
+  static const warning = Color(0xFFE6A23C);
+  static const error = Color(0xFFD9534F);
+}
 
-  static ThemeData get lightTheme {
+class AppTheme {
+  /// In high-contrast mode the primary colour switches from teal to navy,
+  /// because white text on #159B9B is only ~3.4:1.
+  static ThemeData light({bool highContrast = false}) {
+    final primary = highContrast ? AppColors.navy : AppColors.teal;
+    final scheme = ColorScheme.fromSeed(
+      seedColor: AppColors.teal,
+      brightness: Brightness.light,
+    ).copyWith(
+      primary: primary,
+      onPrimary: Colors.white,
+      secondary: AppColors.navy,
+      onSecondary: Colors.white,
+      error: AppColors.error,
+      surface: Colors.white,
+      onSurface: highContrast ? Colors.black : AppColors.navy,
+    );
+    final shape =
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16));
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryTeal,
-        primary: primaryTeal,
-        secondary: deepNavy,
-        surface: lightBackground,
-      ),
-      scaffoldBackgroundColor: lightBackground,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: lightBackground,
-        foregroundColor: deepNavy,
+      colorScheme: scheme,
+      scaffoldBackgroundColor:
+          highContrast ? Colors.white : AppColors.lightBackground,
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
+        scrolledUnderElevation: 0,
+        foregroundColor: scheme.onSurface,
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: primaryTeal,
-          foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, 56), // Large touch targets
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size.fromHeight(56),
+          shape: shape,
+          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size.fromHeight(56),
+          shape: shape,
+          side: BorderSide(color: primary, width: highContrast ? 2.5 : 1.5),
+          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          minimumSize: const Size(48, 48),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide:
+              BorderSide(color: scheme.onSurface.withValues(alpha: 0.4)),
         ),
       ),
     );
