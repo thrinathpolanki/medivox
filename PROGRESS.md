@@ -19,3 +19,32 @@ Known limits:
 Drift database (all tables, indexes, FKs, migrations), medicine registration
 (4 stages, 6 images as files), My Medicines, Medicine detail, delete w/ confirm.
 First step: add drift, drift_flutter, path_provider, build_runner; define tables.
+
+
+## Milestone 2 - Database and medicines  (WRITTEN, NOT YET COMPILED)
+Written: Drift schema (user_profiles, medicines, medicine_images,
+medication_schedules, dose_history, sync_queue) with FKs, indexes, unique keys,
+foreign_keys pragma; repository (register in one transaction, update keeping
+schedule ids + revision bump, delete with cascade + photo file removal);
+file-based photo storage with size/resolution checks; screens: AddMedicine,
+PhotoCapture, Information, ScheduleSetup, Review, Saved, MyMedicines (search +
+filter), MedicineDetail, EditMedicine, DeleteConfirmation; tests.
+
+REQUIRED before first run: `dart run build_runner build --delete-conflicting-outputs`
+(generates lib/database/app_database.g.dart).
+
+Not done / known gaps:
+- Reminders are NOT scheduled yet (M3). Delete does not cancel reminders yet.
+- No sync tombstones/queue writes yet (M5). Database is not encrypted yet (M5).
+- Photo editing and cropping are not available; blur/darkness checks are not
+  implemented (only size and resolution). OCR autofill comes in M4.
+- Read Aloud button absent until TTS (M4). Bottom navigation not added yet.
+- Caregivers, consent, backup and device-info tables are not created yet;
+  they will be added with a schema migration (M5).
+- Schedule timezone stores the device zone abbreviation only; proper IANA zone
+  handling arrives with the reminder engine.
+
+## Next: Milestone 3
+Reminder engine: dose occurrences, local notifications with Taken/Snooze/Skip,
+exact-alarm and notification permissions, reboot rescheduling, Today's Schedule,
+adherence calculations.
