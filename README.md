@@ -1,4 +1,4 @@
-# MediVox (Milestone 1)
+# MediVox (Milestone 2)
 
 ## Setup
 This folder holds the Dart source only. Generate the Android shell first:
@@ -6,6 +6,7 @@ This folder holds the Dart source only. Generate the Android shell first:
     cd medivox
     flutter create . --org com.trimitha --project-name medivox --platforms android
     flutter pub get
+    dart run build_runner build --delete-conflicting-outputs
     dart format .
     flutter analyze
     flutter test
@@ -24,3 +25,14 @@ changes (most likely `go_router`).
 - Storage mode is saved only after a local profile is created or Google sign-in succeeds.
 - Onboarding is never shown again once completed; connectivity is never checked.
 - No Android permissions are requested during onboarding.
+
+## Milestone 2 notes
+- The Drift code generator must run once (command above) and again whenever
+  `lib/database/tables/tables.dart` changes.
+- Updating from Milestone 1: copy `lib/`, `test/`, `pubspec.yaml`, `README.md`,
+  `PROGRESS.md` over your project (do NOT copy over `android/`), then run
+  `flutter pub get` and the build_runner command.
+- Database tests use an in-memory SQLite database; if `flutter test` cannot
+  find a SQLite library on your PC, run those tests on a device/emulator instead.
+- Camera: image_picker opens the system camera app, so no CAMERA permission is
+  declared. Do not add one unless a feature needs it.
