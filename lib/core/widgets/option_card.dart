@@ -32,9 +32,7 @@ class OptionCard extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: selected
-                    ? scheme.primary
-                    : scheme.onSurface.withValues(alpha: 0.25),
+                color: selected ? scheme.primary : scheme.onSurface.withOpacity(0.25),
                 width: selected ? 3 : 1.5,
               ),
             ),
@@ -57,10 +55,7 @@ class OptionCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(
-                    selected
-                        ? Icons.radio_button_checked
-                        : Icons.radio_button_off,
+                Icon(selected ? Icons.radio_button_checked : Icons.radio_button_off,
                     color: scheme.primary),
               ],
             ),
