@@ -1,197 +1,204 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../core/constants/app_constants.dart';
-import '../reminders/services/reminder_provider.dart';
+import '../../../core/widgets/medivox_logo.dart';
+import '../../localization/language_registry.dart';
+import '../../../core/utils/format.dart';
+import '../../adherence/domain/adherence_stats.dart';
+import '../../onboarding/data/settings_controller.dart';
+import '../../reminders/data/reminder_providers.dart';
+import '../../reminders/domain/dose_models.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+/// Milestone 1 home: shows setup status. Feature tiles are visibly DISABLED
+/// (and announced as "not available yet") until their modules are built, so
+/// nothing looks functional that is not.
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
+  static const _months = ['January','February','March','April','May','June',
+    'July','August','September','October','November','December'];
+  static const _days = ['Monday','Tuesday','Wednesday','Thursday','Friday',
+    'Saturday','Sunday'];
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-    _rescheduleOnOpen();
+  // (icon, label, route). A null route means the feature is not built yet.
+  static const _tiles = <(IconData, String, String?)>[
+    (Icons.camera_alt, 'Scan Medicine', null),
+    (Icons.add_circle_outline, 'Add Medicine', '/medicines/add'),
+    (Icons.medication, 'My Medicines', '/medicines'),
+    (Icons.calendar_today, "Today's Schedule", '/schedule'),
+    (Icons.notifications_active, 'Reminders', '/reminders'),
+    (Icons.insights, 'Reports', '/reports'),
+  ];
+
+  String _greeting() {
+    final h = DateTime.now().hour;
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
   }
 
-  Future<void> _rescheduleOnOpen() async {
-    // Wait until after first frame so providers are ready
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString(AppConstants.prefUserId) ?? 'local-user';
-      final scheduler = ref.read(reminderSchedulerProvider);
-      // This ensures alarms are restored after reboot or app kill
-      await scheduler.scheduleAllMedicinesForUser(userId);
-    });
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = ref.watch(settingsProvider);
+    final now = DateTime.now();
+    final date =
+        '${_days[now.weekday - 1]}, ${now.day} ${_months[now.month - 1]} ${now.year}';
+    final name = (s.displayName == null || s.displayName!.isEmpty)
+        ? ''
+        : ', ${s.displayName}';
+    final t = Theme.of(context).textTheme;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('MediVox'),
-        actions: [
-          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.notifications), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.person), onPressed: () {}),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(20),
           children: [
-            Text(
-              'Hello, User',
-              style: Theme.of(context).textTheme.headlineSmall,
+            const Align(alignment: Alignment.centerLeft, child: MediVoxLogo(size: 36)),
+            const SizedBox(height: 20),
+            Semantics(
+              header: true,
+              child: Text('${_greeting()}$name',
+                  style: t.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
             ),
-            const SizedBox(height: 8),
-            Text(
-              '${DateTime.now().day} ${_monthName(DateTime.now().month)} ${DateTime.now().year}',
-              style: Theme.of(context).textTheme.bodyMedium,
+            Text(date, style: t.titleMedium),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(16)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Your setup',
+                      style: t.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 8),
+                  Text('Storage: ${s.storageMode.label}'),
+                  Text('Language: ${languageByCode(s.preferredLanguage)?.englishName ?? 'English'}'),
+                ],
+              ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
+            Consumer(builder: (context, ref, _) {
+              final today = dateOnly(DateTime.now());
+              final doses = ref.watch(dayDosesProvider(today)).valueOrNull ?? const <DoseItem>[];
+              if (doses.isEmpty) return const SizedBox.shrink();
+              final st = AdherenceStats.from(doses);
+              final now = DateTime.now();
+              final next = doses
+                  .where((d) =>
+                      (d.status == DoseStatus.pending || d.status == DoseStatus.snoozed) &&
+                      !d.scheduledAt.isBefore(now.subtract(const Duration(hours: 2))))
+                  .toList();
+              return Semantics(
+                button: true,
+                label: "Today's doses. Taken ${st.taken}, pending ${st.open}, missed ${st.missed}. Open schedule.",
+                child: ExcludeSemantics(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () => context.push('/schedule'),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                          color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text("Today's doses",
+                            style: t.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 6),
+                        Text('Taken ${st.taken} · Pending ${st.open} · Missed ${st.missed} · Skipped ${st.skipped}'),
+                        if (next.isNotEmpty)
+                          Text('Next: ${next.first.title} at '
+                              '${formatTime(next.first.scheduledAt.hour, next.first.scheduledAt.minute)}'),
+                      ]),
+                    ),
+                  ),
+                ),
+              );
+            }),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF4E0),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                  'Scanning is greyed out because it is not available yet.'),
+            ),
+            const SizedBox(height: 16),
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 1.3,
               children: [
-                _buildActionCard(
-                  context,
-                  'Scan Medicine',
-                  Icons.camera_alt,
-                  () => context.push('/scan'),
-                ),
-                _buildActionCard(
-                  context,
-                  'Add Medicine',
-                  Icons.add_circle,
-                  () => context.push('/add-medicine'),
-                ),
-                _buildActionCard(
-                  context,
-                  'My Medicines',
-                  Icons.medication,
-                  () => context.push('/medicines'),
-                ),
-                _buildActionCard(
-                  context,
-                  "Today's Schedule",
-                  Icons.calendar_today,
-                  () => context.push(
-                    '/todays-schedule',
-                  ), // <-- Wired up to the new screen
-                ),
-                _buildActionCard(context, 'Reminders', Icons.alarm, () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Reminders coming in Phase 6'),
+                for (final tile in _tiles)
+                  if (tile.$3 != null)
+                    Semantics(
+                      button: true,
+                      label: tile.$2,
+                      child: ExcludeSemantics(
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => context.push(tile.$3!),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(tile.$1, size: 36, color: Theme.of(context).colorScheme.primary),
+                                const SizedBox(height: 8),
+                                Text(tile.$2,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontWeight: FontWeight.w700)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    Semantics(
+                      enabled: false,
+                      label: '${tile.$2}, not available yet',
+                      child: ExcludeSemantics(
+                        child: Opacity(
+                          opacity: 0.5,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(tile.$1, size: 36),
+                                const SizedBox(height: 8),
+                                Text(tile.$2, textAlign: TextAlign.center),
+                                const Text('Coming soon', style: TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  );
-                }),
-                _buildActionCard(
-                  context,
-                  'Reports',
-                  Icons.bar_chart,
-                  () => context.push('/adherence'),
-                ),
               ],
             ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Voice Assistant coming in Phase 6')),
-          );
-        },
-        icon: const Icon(Icons.mic),
-        label: const Text('Voice Assistant'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 0,
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.camera_alt), label: 'Scan'),
-          NavigationDestination(
-            icon: Icon(Icons.medication),
-            label: 'Medicines',
-          ),
-          NavigationDestination(icon: Icon(Icons.more_horiz), label: 'More'),
-        ],
-        onDestinationSelected: (index) {
-          switch (index) {
-            case 0:
-              break;
-            case 1:
-              context.push('/scan');
-              break;
-            case 2:
-              context.push('/medicines');
-              break;
-            case 3:
-              context.push('/caregiver');
-              break;
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _buildActionCard(
-    BuildContext context,
-    String title,
-    IconData icon,
-    VoidCallback onTap,
-  ) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 40, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+            if (kDebugMode) ...[
+              const SizedBox(height: 24),
+              OutlinedButton(
+                onPressed: () async {
+                  await ref.read(settingsProvider.notifier).resetAll();
+                  if (context.mounted) context.go('/welcome');
+                },
+                child: const Text('Reset setup (debug builds only)'),
+              ),
+            ],
           ],
         ),
       ),
     );
-  }
-
-  String _monthName(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return months[month - 1];
   }
 }
