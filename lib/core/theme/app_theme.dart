@@ -26,8 +26,7 @@ class AppTheme {
       surface: Colors.white,
       onSurface: highContrast ? Colors.black : AppColors.navy,
     );
-    final shape =
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16));
+    final shape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(16));
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
@@ -65,8 +64,7 @@ class AppTheme {
         fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide:
-              BorderSide(color: scheme.onSurface.withValues(alpha: 0.4)),
+          borderSide: BorderSide(color: scheme.onSurface.withOpacity(0.4)),
         ),
       ),
     );
