@@ -83,8 +83,7 @@ class OnboardingScaffold extends StatelessWidget {
               FilledButton(onPressed: onPrimary, child: Text(primaryLabel)),
               if (secondaryLabel != null) ...[
                 const SizedBox(height: 4),
-                TextButton(
-                    onPressed: onSecondary, child: Text(secondaryLabel!)),
+                TextButton(onPressed: onSecondary, child: Text(secondaryLabel!)),
               ],
             ],
           ),
