@@ -37,15 +37,6 @@ class _TermsScreenState extends ConsumerState<TermsScreen> {
           : 'Please read and accept the Terms and Conditions to continue.',
       step: updating ? null : 2,
       scrollable: false,
-      bottom: CheckboxListTile(
-        value: _agreed,
-        onChanged: (v) => setState(() => _agreed = v ?? false),
-        controlAffinity: ListTileControlAffinity.leading,
-        contentPadding: EdgeInsets.zero,
-        title: const Text('I have read and agree to the Terms and Conditions'),
-      ),
-      primaryLabel: 'Continue',
-      onPrimary: _agreed ? _continue : null,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -56,6 +47,15 @@ class _TermsScreenState extends ConsumerState<TermsScreen> {
           version: LegalDocuments.termsVersion,
         ),
       ),
+      bottom: CheckboxListTile(
+        value: _agreed,
+        onChanged: (v) => setState(() => _agreed = v ?? false),
+        controlAffinity: ListTileControlAffinity.leading,
+        contentPadding: EdgeInsets.zero,
+        title: const Text('I have read and agree to the Terms and Conditions'),
+      ),
+      primaryLabel: 'Continue',
+      onPrimary: _agreed ? _continue : null,
     );
   }
 }
