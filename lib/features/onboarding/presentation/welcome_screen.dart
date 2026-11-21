@@ -39,8 +39,7 @@ class WelcomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text('Your intelligent medicine companion',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleMedium),
+                  textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
               const SizedBox(height: 24),
               Expanded(
                 child: ListView(
@@ -52,8 +51,7 @@ class WelcomeScreen extends ConsumerWidget {
                           Icon(f.$1, color: AppColors.teal, size: 28),
                           const SizedBox(width: 14),
                           Expanded(
-                              child: Text(f.$2,
-                                  style: theme.textTheme.titleMedium)),
+                              child: Text(f.$2, style: theme.textTheme.titleMedium)),
                         ]),
                       ),
                   ],
