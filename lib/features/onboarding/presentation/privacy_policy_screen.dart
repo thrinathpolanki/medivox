@@ -10,8 +10,7 @@ import 'legal_document_view.dart';
 class PrivacyPolicyScreen extends ConsumerStatefulWidget {
   const PrivacyPolicyScreen({super.key});
   @override
-  ConsumerState<PrivacyPolicyScreen> createState() =>
-      _PrivacyPolicyScreenState();
+  ConsumerState<PrivacyPolicyScreen> createState() => _PrivacyPolicyScreenState();
 }
 
 class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
@@ -35,15 +34,6 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
       subtitle: 'How MediVox handles your information.',
       step: updating ? null : 3,
       scrollable: false,
-      bottom: CheckboxListTile(
-        value: _agreed,
-        onChanged: (v) => setState(() => _agreed = v ?? false),
-        controlAffinity: ListTileControlAffinity.leading,
-        contentPadding: EdgeInsets.zero,
-        title: const Text('I have read and understood the Privacy Policy'),
-      ),
-      primaryLabel: 'Continue',
-      onPrimary: _agreed ? _continue : null,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -54,6 +44,15 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
           version: LegalDocuments.privacyVersion,
         ),
       ),
+      bottom: CheckboxListTile(
+        value: _agreed,
+        onChanged: (v) => setState(() => _agreed = v ?? false),
+        controlAffinity: ListTileControlAffinity.leading,
+        contentPadding: EdgeInsets.zero,
+        title: const Text('I have read and understood the Privacy Policy'),
+      ),
+      primaryLabel: 'Continue',
+      onPrimary: _agreed ? _continue : null,
     );
   }
 }
