@@ -24,8 +24,7 @@ class AccessibilitySetupScreen extends ConsumerWidget {
     Widget sw(String title, String sub, bool v,
             AccessibilitySettings Function(bool) f) =>
         SwitchListTile(
-          title:
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+          title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
           subtitle: Text(sub),
           value: v,
           onChanged: (x) => update(f(x)),
@@ -43,30 +42,21 @@ class AccessibilitySetupScreen extends ConsumerWidget {
             decoration: BoxDecoration(
                 color: Colors.white, borderRadius: BorderRadius.circular(16)),
             child: Column(children: [
-              sw(
-                  'Voice navigation',
+              sw('Voice navigation',
                   'Control the app by voice. The microphone is only used after you start it, and permission is asked then.',
-                  a.voiceNavigation,
-                  (x) => a.copyWith(voiceNavigation: x)),
-              sw(
-                  'Screen reader support',
+                  a.voiceNavigation, (x) => a.copyWith(voiceNavigation: x)),
+              sw('Screen reader support',
                   'Extra spoken labels for TalkBack.',
-                  a.screenReaderSupport,
-                  (x) => a.copyWith(screenReaderSupport: x)),
-              sw('Large text', 'Increase text size by 25%.', a.largeText,
-                  (x) => a.copyWith(largeText: x)),
+                  a.screenReaderSupport, (x) => a.copyWith(screenReaderSupport: x)),
+              sw('Large text', 'Increase text size by 25%.',
+                  a.largeText, (x) => a.copyWith(largeText: x)),
               sw('High contrast', 'Stronger colours and borders.',
                   a.highContrast, (x) => a.copyWith(highContrast: x)),
-              sw(
-                  'Haptic feedback',
-                  'Gentle vibration cues. Never the only signal.',
-                  a.hapticFeedback,
-                  (x) => a.copyWith(hapticFeedback: x)),
-              sw(
-                  'Screen-free reminders',
+              sw('Haptic feedback', 'Gentle vibration cues. Never the only signal.',
+                  a.hapticFeedback, (x) => a.copyWith(hapticFeedback: x)),
+              sw('Screen-free reminders',
                   'Spoken reminders without looking at the screen (activated with the reminder feature).',
-                  a.screenFreeReminders,
-                  (x) => a.copyWith(screenFreeReminders: x)),
+                  a.screenFreeReminders, (x) => a.copyWith(screenFreeReminders: x)),
             ]),
           ),
           const SizedBox(height: 16),
@@ -77,8 +67,7 @@ class AccessibilitySetupScreen extends ConsumerWidget {
             max: 1.6,
             divisions: 8,
             display: '${(a.fontScale * 100).round()}%',
-            onChanged: (v) =>
-                ctrl.updateAccessibility(a.copyWith(fontScale: v)),
+            onChanged: (v) => ctrl.updateAccessibility(a.copyWith(fontScale: v)),
           ),
           _SliderTile(
             label: 'Speech speed',
@@ -88,8 +77,7 @@ class AccessibilitySetupScreen extends ConsumerWidget {
             divisions: 9,
             display: a.speechRate.toStringAsFixed(1),
             note: 'Takes effect when voice output is added.',
-            onChanged: (v) =>
-                ctrl.updateAccessibility(a.copyWith(speechRate: v)),
+            onChanged: (v) => ctrl.updateAccessibility(a.copyWith(speechRate: v)),
           ),
           _SliderTile(
             label: 'Speech volume',
@@ -99,8 +87,7 @@ class AccessibilitySetupScreen extends ConsumerWidget {
             divisions: 9,
             display: '${(a.speechVolume * 100).round()}%',
             note: 'Takes effect when voice output is added.',
-            onChanged: (v) =>
-                ctrl.updateAccessibility(a.copyWith(speechVolume: v)),
+            onChanged: (v) => ctrl.updateAccessibility(a.copyWith(speechVolume: v)),
           ),
           const SizedBox(height: 8),
           Container(
@@ -108,8 +95,7 @@ class AccessibilitySetupScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
                 color: Colors.white, borderRadius: BorderRadius.circular(12)),
-            child:
-                const Text('Preview: Paracetamol 500 mg, 1 tablet after food.'),
+            child: const Text('Preview: Paracetamol 500 mg, 1 tablet after food.'),
           ),
         ],
       ),
@@ -150,8 +136,7 @@ class _SliderTile extends StatelessWidget {
           semanticFormatterCallback: (_) => '$label $display',
           onChanged: onChanged,
         ),
-        if (note != null)
-          Text(note!, style: Theme.of(context).textTheme.bodySmall),
+        if (note != null) Text(note!, style: Theme.of(context).textTheme.bodySmall),
       ],
     );
   }
