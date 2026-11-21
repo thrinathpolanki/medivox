@@ -25,9 +25,8 @@ class _StorageSelectionScreenState extends State<StorageSelectionScreen> {
       primaryLabel: 'Continue',
       onPrimary: _choice == StorageMode.none
           ? null
-          : () => context.push(_choice == StorageMode.local
-              ? '/local-profile'
-              : '/google-signin'),
+          : () => context.push(
+              _choice == StorageMode.local ? '/local-profile' : '/google-signin'),
       child: Column(
         children: [
           OptionCard(
