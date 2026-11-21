@@ -61,7 +61,7 @@ class _GoogleSignInScreenState extends ConsumerState<GoogleSignInScreen> {
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: scheme.error.withValues(alpha: 0.1),
+                  color: scheme.error.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: scheme.error),
                 ),
@@ -85,9 +85,7 @@ class _Bullet extends StatelessWidget {
         child: Row(children: [
           Icon(icon, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 12),
-          Expanded(
-              child:
-                  Text(text, style: Theme.of(context).textTheme.titleMedium)),
+          Expanded(child: Text(text, style: Theme.of(context).textTheme.titleMedium)),
         ]),
       );
 }
