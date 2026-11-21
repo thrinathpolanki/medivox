@@ -21,8 +21,7 @@ class OnboardingCompleteScreen extends ConsumerWidget {
     ];
     return OnboardingScaffold(
       title: "You're all set!",
-      subtitle:
-          'MediVox is configured. You can change any of this in Settings.',
+      subtitle: 'MediVox is configured. You can change any of this in Settings.',
       step: 8,
       primaryLabel: 'Go to Home',
       onPrimary: () async {
@@ -40,8 +39,7 @@ class OnboardingCompleteScreen extends ConsumerWidget {
                 const Icon(Icons.check, color: AppColors.success),
                 const SizedBox(width: 12),
                 Expanded(
-                    child: Text(r,
-                        style: Theme.of(context).textTheme.titleMedium)),
+                    child: Text(r, style: Theme.of(context).textTheme.titleMedium)),
               ]),
             ),
         ],
