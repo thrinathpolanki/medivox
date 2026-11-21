@@ -16,7 +16,8 @@ class LanguageSelectionScreen extends ConsumerStatefulWidget {
 class _LanguageSelectionScreenState
     extends ConsumerState<LanguageSelectionScreen> {
   String _query = '';
-  late String _selected = ref.read(settingsProvider).preferredLanguage ?? 'en';
+  late String _selected =
+      ref.read(settingsProvider).preferredLanguage ?? 'en';
 
   @override
   Widget build(BuildContext context) {
@@ -81,20 +82,17 @@ class _LanguageSelectionScreenState
                           child: ListTile(
                             minVerticalPadding: 12,
                             selected: sel,
-                            selectedTileColor:
-                                scheme.primary.withValues(alpha: 0.12),
+                            selectedTileColor: scheme.primary.withOpacity(0.12),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
                             title: Text(l.nativeName,
-                                textDirection: l.rtl
-                                    ? TextDirection.rtl
-                                    : TextDirection.ltr,
+                                textDirection:
+                                    l.rtl ? TextDirection.rtl : TextDirection.ltr,
                                 style: const TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.w600)),
                             subtitle: Text(l.englishName),
                             trailing: sel
-                                ? Icon(Icons.check_circle,
-                                    color: scheme.primary)
+                                ? Icon(Icons.check_circle, color: scheme.primary)
                                 : null,
                             onTap: () => setState(() => _selected = l.code),
                           ),
