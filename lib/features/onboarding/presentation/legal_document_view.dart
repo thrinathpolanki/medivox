@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import '../domain/legal_documents.dart';
 
 class LegalDocumentView extends StatelessWidget {
-  const LegalDocumentView(
-      {super.key, required this.sections, required this.version});
+  const LegalDocumentView({super.key, required this.sections, required this.version});
   final List<LegalSection> sections;
   final String version;
 
