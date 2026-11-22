@@ -74,6 +74,53 @@ Not done / known limits:
 - No separate ReminderHistoryScreen: Dose History covers it. No report export.
 - Snoozed time is not stored; a snoozed dose is "missed" 2h after its original time.
 
-## Next: Milestone 4
-OCR packaging reader, scan flow, similar-medicine warnings, TTS (incl. Read Aloud
-and screen-free reminders), voice assistant, gen-l10n.
+
+## Milestone 4 - Scan, read, warn, speak  (WRITTEN, NOT YET COMPILED)
+Written: ML Kit OCR (Latin + Devanagari), image quality gate, rule-based packaging
+parser, package clustering for multi-package photos, matcher with evidence and
+conflict detection, experimental look-signature, similar-medicine checker, TTS
+service (pause/resume/repeat, language check, no silent language swap), one-shot
+speech recognition, English voice assistant, Read Aloud on medicine details,
+spoken reminder screen with voice yes/no confirmation, in-app due-dose watcher,
+haptic patterns, screens: Scan, Guidance, Results (multi), Identification result,
+Unregistered, Verification, Similar warnings, Packaging reader, Voice assistant.
+
+REQUIRED: manifest (RECORD_AUDIO + queries) and Gradle (ML Kit Devanagari) edits.
+
+Not done / limits:
+- Not run on a device. OCR accuracy is UNMEASURED; thresholds are uncalibrated.
+- No offline medicine catalogue; no TFLite embedding model; no live camera preview
+  (system camera app is used), so voice-guided camera positioning is not possible.
+- Spoken reminders play when the reminder screen opens (tap, or due while the app is
+  open). Speaking while locked/closed needs a foreground service: not implemented.
+- Voice assistant understands English only; speech recognition may need internet.
+- ScreenFreeReminderScreen is merged into the reminder screen. No gen-l10n/ARB yet.
+- Settings screen still missing (voice assistant says so).
+
+## Next: Milestone 5
+Caregiver/family profiles, Settings screens, haptic settings, Firebase + sync,
+security rules, encryption, backups, remaining tests, release builds.
+
+## Milestone 4 fix pass
+Scan matching reworked (see README "Matching update"); playback controls redesigned as
+Play/Pause/Resume, Replay, Stop in one aligned row. Not yet re-tested on a device.
+
+## Camera + layout pass
+In-app live camera (camera package) for scan/reader/registration; scan screen opens the
+camera directly. Alignment audit: compact button padding, one-line labels in button rows,
+home tiles that grow with text size, aligned Play/Pause/Replay/Stop row. Not yet device-tested.
+
+## Accuracy + camera pass 2
+Added Matched tier, OCR-confusion folding, sideways-photo retry, second-photo confirmation;
+full-screen immersive camera without frame or spoken guidance. Needs android/build.gradle.kts
+camera fix (concurrent-futures) if the camera plugin fails to compile.
+
+## Spoken plan pass
+MedicinePlan (name/when/dosage from saved data), duplicate merge in matcher, word-coverage
+name scoring (variant words like Forte count half, capped below Matched), duplicate warning
+on the review screen. Not yet device-tested.
+
+## Spoken plan pass 2 (build tag M4-r8)
+Spoken order is now: name, dose, when ("Take 1 tablet at 8 AM, after food."). Several clusters that
+all match the same medicine are merged into one package. Multi-result screen speaks plans only.
+Home screen shows the build tag so you can confirm the installed version.
