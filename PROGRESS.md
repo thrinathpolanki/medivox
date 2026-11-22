@@ -48,3 +48,32 @@ Not done / known gaps:
 Reminder engine: dose occurrences, local notifications with Taken/Snooze/Skip,
 exact-alarm and notification permissions, reboot rescheduling, Today's Schedule,
 adherence calculations.
+
+
+## Milestone 3 - Reminders, schedule, adherence  (WRITTEN, NOT YET COMPILED)
+Written: pure planner; DoseRepository (reconcile: missed after 2h, prune stale
+pending, insert future doses; never touches taken/skipped history); notification
+gateway (flutter_local_notifications 19.x, exact alarms with inexact fallback,
+Taken/Snooze/Skip actions handled in a background isolate on the shared Drift
+database); ReminderService (resync, one at a time); permission card (asked only
+on button press); screens: Today's Schedule, Reminder notification, Reminder
+settings (+test reminder), Adherence, Dose history, Reports, Adherence by
+medicine; home summary; medicine detail history; tests.
+
+REQUIRED: Android manifest + Gradle desugaring edits (see README).
+
+Not done / known limits:
+- Not run on a device: notification actions, reboot, exact-alarm flow, battery
+  optimisation all need real-phone testing.
+- Time-zone change while the app is closed is only fixed on next app open.
+- Doses are generated 14 days ahead; if the app is not opened for longer, days
+  beyond that window have no records (not counted as missed).
+- Notification text shows the medicine name on the lock screen (private
+  visibility is requested, but behaviour depends on the phone's settings).
+- Screen-free spoken reminders need TTS (M4). Caregiver missed-dose alerts (M5).
+- No separate ReminderHistoryScreen: Dose History covers it. No report export.
+- Snoozed time is not stored; a snoozed dose is "missed" 2h after its original time.
+
+## Next: Milestone 4
+OCR packaging reader, scan flow, similar-medicine warnings, TTS (incl. Read Aloud
+and screen-free reminders), voice assistant, gen-l10n.
