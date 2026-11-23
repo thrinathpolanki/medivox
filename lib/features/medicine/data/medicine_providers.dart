@@ -1,30 +1,37 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../database/app_database.dart';
 import '../../onboarding/data/settings_controller.dart';
+import '../../recognition/data/recognition_providers.dart';
 import '../../reminders/data/reminder_providers.dart';
 import '../../onboarding/domain/storage_mode.dart';
 import '../domain/medicine_models.dart';
 import 'image_storage.dart';
 import 'medicine_repository.dart';
 
-final appDatabaseProvider = Provider<AppDatabase>((ref) {
+final Provider<AppDatabase> appDatabaseProvider = Provider<AppDatabase>((ref) {
   final db = AppDatabase.open();
   ref.onDispose(db.close);
   return db;
 });
 
-final imageStorageProvider = Provider<ImageStorage>((ref) => FileImageStorage());
+final Provider<ImageStorage> imageStorageProvider = Provider<ImageStorage>((ref) => FileImageStorage());
 
-final medicineRepositoryProvider = Provider<MedicineRepository>((ref) => MedicineRepository(
+final Provider<MedicineRepository> medicineRepositoryProvider = Provider<MedicineRepository>((ref) => MedicineRepository(
       ref.watch(appDatabaseProvider),
       ref.watch(imageStorageProvider),
-      onChanged: () => ref.read(reminderServiceProvider).resync(),
+      onChanged: () {
+        // Read the printed text of the new photos in the background so scans can use it.
+        unawaited(ref.read(textIndexWarmupProvider)().catchError((_) {}));
+        return ref.read(reminderServiceProvider).resync();
+      },
     ));
 
 /// Resolves the active profile id (local profile or Google uid) and makes sure
 /// its row exists. Local mode never touches Firebase.
-final activeProfileProvider = FutureProvider<String>((ref) async {
+final FutureProvider<String> activeProfileProvider = FutureProvider<String>((ref) async {
   final (mode, localId, googleId, name, lang) = ref.watch(settingsProvider.select(
       (s) => (s.storageMode, s.localProfileId, s.googleUserId, s.displayName, s.preferredLanguage)));
   final userId = mode == StorageMode.google ? googleId : localId;
