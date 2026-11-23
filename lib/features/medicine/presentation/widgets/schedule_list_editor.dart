@@ -173,13 +173,16 @@ class _ScheduleCardState extends State<_ScheduleCard> {
           Row(children: [
             Expanded(
               child: OutlinedButton(
-                  onPressed: _pickStart, child: Text('Start: ${formatDate(s.startDate)}')),
+                  onPressed: _pickStart,
+                  child: FittedBox(fit: BoxFit.scaleDown, child: Text('Start: ${formatDate(s.startDate)}'))),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: OutlinedButton(
                 onPressed: _pickEnd,
-                child: Text(s.endDate == null ? 'End: none' : 'End: ${formatDate(s.endDate!)}'),
+                child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(s.endDate == null ? 'End: none' : 'End: ${formatDate(s.endDate!)}')),
               ),
             ),
           ]),
