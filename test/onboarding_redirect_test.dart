@@ -4,7 +4,7 @@ import 'package:medivox/features/onboarding/domain/legal_documents.dart';
 import 'package:medivox/features/onboarding/domain/storage_mode.dart';
 import 'package:medivox/routing/app_router.dart';
 
-AppSettings _legalOk() => const AppSettings(
+AppSettings _legalOk() => AppSettings(
       termsAccepted: true,
       termsVersion: LegalDocuments.termsVersion,
       privacyAcknowledged: true,
@@ -40,7 +40,7 @@ void main() {
   });
 
   test('outdated legal version forces re-acknowledgement', () {
-    const old = AppSettings(
+    final old = AppSettings(
       onboardingCompleted: true,
       storageMode: StorageMode.local,
       termsAccepted: true,
