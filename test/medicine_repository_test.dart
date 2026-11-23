@@ -8,14 +8,10 @@ import 'package:medivox/features/medicine/domain/medicine_models.dart';
 class _FakeStorage implements ImageStorage {
   final deleted = <String>[];
   @override
-  Future<StagedImage> stage(String sourcePath) async =>
-      StagedImage(path: sourcePath);
+  Future<StagedImage> stage(String sourcePath) async => StagedImage(path: sourcePath);
   @override
-  Future<List<StoredImage>> persistAll(
-          String id, Map<ImageSlot, String> staged) async =>
-      [
-        for (final e in staged.entries)
-          StoredImage(e.key, '/fake/$id/${e.key.name}.jpg', 'sum'),
+  Future<List<StoredImage>> persistAll(String id, Map<ImageSlot, String> staged) async => [
+        for (final e in staged.entries) StoredImage(e.key, '/fake/$id/${e.key.name}.jpg', 'sum'),
       ];
   @override
   Future<void> deleteMedicineImages(String id) async => deleted.add(id);
@@ -37,17 +33,11 @@ void main() {
   tearDown(() => db.close());
 
   MedicineDraft draft() => MedicineDraft(
-        info: const MedicineInfo(
-            name: ' Paracetamol ', strength: '500 mg', dosage: '1 tablet'),
-        images: const {
-          ImageSlot.stripFront1: '/tmp/a.jpg',
-          ImageSlot.stripBack1: '/tmp/b.jpg'
-        },
+        info: const MedicineInfo(name: ' Paracetamol ', strength: '500 mg', dosage: '1 tablet'),
+        images: const {ImageSlot.stripFront1: '/tmp/a.jpg', ImageSlot.stripBack1: '/tmp/b.jpg'},
         schedules: [
-          ScheduleDraft.create('s1', SchedulePeriod.morning)
-              .copyWith(dosage: '1 tablet'),
-          ScheduleDraft.create('s2', SchedulePeriod.night)
-              .copyWith(dosage: '1 tablet'),
+          ScheduleDraft.create('s1', SchedulePeriod.morning).copyWith(dosage: '1 tablet'),
+          ScheduleDraft.create('s2', SchedulePeriod.night).copyWith(dosage: '1 tablet'),
         ],
       );
 
@@ -62,13 +52,10 @@ void main() {
     expect(d.thumbnailPath, contains('stripFront1'));
   });
 
-  test(
-      'update keeps existing schedule ids, removes dropped ones, bumps revision',
-      () async {
+  test('update keeps existing schedule ids, removes dropped ones, bumps revision', () async {
     final id = await repo.registerMedicine(userId: 'u1', draft: draft());
     final before = (await repo.watchOne(id).first)!;
-    final kept = ScheduleDraft.fromRow(
-        before.schedules.firstWhere((s) => s.scheduleId == 's1'));
+    final kept = ScheduleDraft.fromRow(before.schedules.firstWhere((s) => s.scheduleId == 's1'));
     await repo.updateMedicine(
       medicineId: id,
       info: const MedicineInfo(name: 'Paracetamol', strength: '650 mg'),
