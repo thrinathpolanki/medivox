@@ -118,7 +118,7 @@ class _State extends ConsumerState<AdherenceScreen> {
             child: Column(children: [
               Icon(icon, color: color),
               Text('$n', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
-              Text(label),
+              FittedBox(fit: BoxFit.scaleDown, child: Text(label)),
             ]),
           ),
         ),
