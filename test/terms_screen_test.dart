@@ -6,8 +6,7 @@ import 'package:medivox/features/onboarding/presentation/terms_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('Continue is disabled until the checkbox is ticked',
-      (tester) async {
+  testWidgets('Continue is disabled until the checkbox is ticked', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     await tester.pumpWidget(ProviderScope(
@@ -15,8 +14,7 @@ void main() {
       child: const MaterialApp(home: TermsScreen()),
     ));
 
-    FilledButton button() =>
-        tester.widget<FilledButton>(find.byType(FilledButton));
+    FilledButton button() => tester.widget<FilledButton>(find.byType(FilledButton));
     expect(button().onPressed, isNull);
 
     await tester.tap(find.byType(CheckboxListTile));
