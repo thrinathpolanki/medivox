@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/onboarding_scaffold.dart';
-import '../data/medicine_providers.dart';
-import 'widgets/schedule_list_editor.dart';
+import '../../reminders/presentation/reminder_permission_card.dart';
 
-class MedicineScheduleSetupScreen extends ConsumerWidget {
-  const MedicineScheduleSetupScreen({super.key});
+class MedicineSavedScreen extends StatelessWidget {
+  const MedicineSavedScreen({super.key, required this.medicineId});
+  final String medicineId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final d = ref.watch(medicineDraftProvider);
+  Widget build(BuildContext context) {
     return OnboardingScaffold(
-      title: 'Medicine schedule',
-      subtitle: 'Add one entry for each time of day. Dosage is entered by you.',
-      step: 3,
+      title: 'Medicine saved',
+      subtitle: 'It is now in My Medicines. Reminders are planned from the schedule you set.',
       totalSteps: 4,
-      primaryLabel: 'Next',
-      onPrimary: d.schedulesValid ? () => context.push('/medicines/add/review') : null,
-      child: ScheduleListEditor(
-        schedules: d.schedules,
-        onChanged: (l) =>
-            ref.read(medicineDraftProvider.notifier).update((x) => x.copyWith(schedules: l)),
-      ),
+      primaryLabel: 'View medicine',
+      onPrimary: () => context.go('/medicines/$medicineId'),
+      secondaryLabel: 'Add another medicine',
+      onSecondary: () => context.go('/medicines/add'),
+      child: Column(children: [
+        const Icon(Icons.check_circle, size: 96, color: AppColors.success),
+        const ReminderPermissionCard(),
+        const SizedBox(height: 8),
+        TextButton(onPressed: () => context.go('/home'), child: const Text('Go to Home')),
+      ]),
     );
   }
 }
