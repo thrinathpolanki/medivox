@@ -35,6 +35,13 @@ class _State extends ConsumerState<MyMedicinesScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.canPop() ? context.pop() : context.go('/home'),
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Check for similar medicines',
+            icon: const Icon(Icons.compare_arrows),
+            onPressed: () => context.push('/similar'),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/medicines/add'),
