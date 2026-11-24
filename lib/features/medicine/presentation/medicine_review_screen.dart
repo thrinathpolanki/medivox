@@ -1,108 +1,145 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
-import '../../../core/utils/format.dart';
 import '../../../core/widgets/onboarding_scaffold.dart';
 import '../data/medicine_providers.dart';
 import '../domain/medicine_models.dart';
 import 'widgets/medicine_thumbnail.dart';
 
-class MedicineReviewScreen extends ConsumerStatefulWidget {
-  const MedicineReviewScreen({super.key});
-  @override
-  ConsumerState<MedicineReviewScreen> createState() => _State();
-}
+class MedicinePhotoCaptureScreen extends ConsumerWidget {
+  const MedicinePhotoCaptureScreen({super.key});
 
-class _State extends ConsumerState<MedicineReviewScreen> {
-  bool _saving = false;
-  String? _error;
-
-  Future<void> _save() async {
-    setState(() {
-      _saving = true;
-      _error = null;
-    });
+  Future<void> _pick(BuildContext context, WidgetRef ref, ImageSlot slot, ImageSource src) async {
+    final messenger = ScaffoldMessenger.of(context);
     try {
-      final userId = await ref.read(activeProfileProvider.future);
-      final id = await ref
-          .read(medicineRepositoryProvider)
-          .registerMedicine(userId: userId, draft: ref.read(medicineDraftProvider));
-      // Files are now permanent; clear the draft without deleting them.
-      await ref.read(medicineDraftProvider.notifier).reset(keepFiles: true);
-      if (mounted) context.go('/medicines/saved/$id');
-    } catch (e) {
-      if (mounted) {
-        setState(() => _error = 'Could not save the medicine. Nothing was changed. '
-            'Check free storage and try again.');
+      final String? picked;
+      if (src == ImageSource.camera) {
+        picked = await context.push<String>('/camera');
+      } else {
+        picked = (await ImagePicker().pickImage(source: src, imageQuality: 92, maxWidth: 2400))?.path;
       }
-    } finally {
-      if (mounted) setState(() => _saving = false);
+      if (picked == null) return;
+      final storage = ref.read(imageStorageProvider);
+      final staged = await storage.stage(picked);
+      if (staged.path == null) {
+        messenger.showSnackBar(SnackBar(content: Text(staged.problem ?? 'Photo rejected.')));
+        return;
+      }
+      final old = ref.read(medicineDraftProvider).images[slot];
+      ref.read(medicineDraftProvider.notifier).update(
+          (d) => d.copyWith(images: {...d.images, slot: staged.path!}));
+      if (old != null) await storage.discard([old]);
+    } catch (_) {
+      messenger.showSnackBar(const SnackBar(
+          content: Text('Could not get the photo. Check camera or photo access and try again.')));
     }
   }
 
-  Widget _row(String k, String v) => v.trim().isEmpty
-      ? const SizedBox.shrink()
-      : Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            SizedBox(width: 130, child: Text(k, style: const TextStyle(fontWeight: FontWeight.w700))),
-            Expanded(child: Text(v)),
+  void _sheet(BuildContext context, WidgetRef ref, ImageSlot slot, bool hasImage) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Wrap(children: [
+          ListTile(
+            leading: const Icon(Icons.photo_camera),
+            title: Text(hasImage ? 'Retake with camera' : 'Take photo'),
+            onTap: () {
+              Navigator.pop(ctx);
+              _pick(context, ref, slot, ImageSource.camera);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo_library),
+            title: const Text('Choose from gallery'),
+            onTap: () {
+              Navigator.pop(ctx);
+              _pick(context, ref, slot, ImageSource.gallery);
+            },
+          ),
+          if (hasImage)
+            ListTile(
+              leading: const Icon(Icons.delete_outline),
+              title: const Text('Remove photo'),
+              onTap: () async {
+                Navigator.pop(ctx);
+                final path = ref.read(medicineDraftProvider).images[slot];
+                ref.read(medicineDraftProvider.notifier).update(
+                    (d) => d.copyWith(images: {...d.images}..remove(slot)));
+                if (path != null) await ref.read(imageStorageProvider).discard([path]);
+              },
+            ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _slot(BuildContext context, WidgetRef ref, MedicineDraft d, ImageSlot slot) {
+    final path = d.images[slot];
+    return Expanded(
+      child: Semantics(
+        button: true,
+        label: path == null ? '${slot.label}, empty. Add photo.' : '${slot.label}, added. Change photo.',
+        child: ExcludeSemantics(
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => _sheet(context, ref, slot, path != null),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                ),
+                child: path == null
+                    ? Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Icon(Icons.add_a_photo, size: 32, color: Theme.of(context).colorScheme.primary),
+                        const SizedBox(height: 4),
+                        Text(slot.label, textAlign: TextAlign.center),
+                      ])
+                    : LayoutBuilder(
+                        builder: (_, c) => MedicineThumbnail(path: path, size: c.maxWidth, label: slot.label)),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final d = ref.watch(medicineDraftProvider);
+    Widget group(String title, ImageSlot a, ImageSlot b) => Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+            const SizedBox(height: 8),
+            Row(children: [
+              _slot(context, ref, d, a),
+              const SizedBox(width: 12),
+              _slot(context, ref, d, b),
+            ]),
           ]),
         );
 
-  @override
-  Widget build(BuildContext context) {
-    final d = ref.watch(medicineDraftProvider);
-    final i = d.info;
-    final scheme = Theme.of(context).colorScheme;
     return OnboardingScaffold(
-      title: 'Review and save',
-      subtitle: 'Please check that everything is correct.',
-      step: 4,
+      title: 'Medicine photos',
+      subtitle: '${d.images.length} of ${MedicineConfig.maxImages} added. '
+          'At least ${MedicineConfig.minImages} needed.',
+      step: 1,
       totalSteps: 4,
-      primaryLabel: _saving ? 'Saving…' : 'Confirm and save',
-      onPrimary: _saving ? null : _save,
+      primaryLabel: 'Next',
+      onPrimary: d.hasEnoughImages ? () => context.push('/medicines/add/info') : null,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Wrap(spacing: 8, runSpacing: 8, children: [
-          for (final e in d.images.entries)
-            MedicineThumbnail(path: e.value, size: 72, label: e.key.label),
-        ]),
+        const Text('Tips: use good light, hold the phone steady, fill the frame, '
+            'and keep text sharp and free of glare.'),
         const SizedBox(height: 16),
-        _row('Name', i.name),
-        _row('Generic name', i.genericName),
-        _row('Strength', i.strength),
-        _row('Composition', i.composition),
-        _row('Manufacturer', i.manufacturer),
-        _row('Type', i.medicineType),
-        _row('Prescribed dosage', i.dosage),
-        _row('Prescription ref.', i.prescriptionReference),
-        _row('Notes', i.notes),
-        const Divider(height: 28),
-        Text('Schedule', style: Theme.of(context).textTheme.titleMedium),
-        if (d.schedules.isEmpty) const Text('No schedule. You can add one later.'),
-        for (final s in d.schedules)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: Text('${s.period.label} at ${s.timeText}: ${s.dosage.trim()}, '
-                '${s.food.label}. ${s.repeatText}. From ${formatDate(s.startDate)}'
-                '${s.endDate == null ? '' : ' to ${formatDate(s.endDate!)}'}.'
-                '${s.enabled ? '' : ' (reminder off)'}'),
-          ),
-        const SizedBox(height: 12),
-        const Text('Dosages are exactly what you entered. MediVox never suggests or changes dosages.'),
-        if (_error != null) ...[
-          const SizedBox(height: 12),
-          Semantics(
-            liveRegion: true,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                  color: scheme.error.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-              child: Text(_error!),
-            ),
-          ),
-        ],
+        group('Strip front', ImageSlot.stripFront1, ImageSlot.stripFront2),
+        group('Strip back', ImageSlot.stripBack1, ImageSlot.stripBack2),
+        group('Tablet', ImageSlot.tablet1, ImageSlot.tablet2),
       ]),
     );
   }
