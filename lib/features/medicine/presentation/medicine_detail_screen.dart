@@ -7,6 +7,10 @@ import 'package:go_router/go_router.dart';
 import '../../../core/utils/format.dart';
 import '../../reminders/data/reminder_providers.dart';
 import '../../reminders/presentation/status_chip.dart';
+import '../../recognition/data/recognition_providers.dart';
+import '../../recognition/data/similar_medicine_checker.dart';
+import '../../speech/medicine_speech.dart';
+import '../../speech/speech_providers.dart';
 import '../data/medicine_providers.dart';
 import '../domain/medicine_models.dart';
 import 'widgets/medicine_thumbnail.dart';
@@ -49,6 +53,43 @@ class MedicineDetailScreen extends ConsumerWidget {
               child: Text(med.medicineName,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
             ),
+            const SizedBox(height: 8),
+            FilledButton.icon(
+              icon: const Icon(Icons.volume_up),
+              label: const Text('Read aloud'),
+              onPressed: () => speakChecked(context, ref, MedicineSpeech.describe(m)),
+            ),
+            const SizedBox(height: 8),
+            const SpeechControls(),
+            Consumer(builder: (context, ref, _) {
+              final all = ref.watch(similarWarningsProvider).valueOrNull ?? const <SimilarityWarning>[];
+              final mine = all
+                  .where((w) => w.a.medicine.medicineId == medicineId || w.b.medicine.medicineId == medicineId)
+                  .toList();
+              if (mine.isEmpty) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: () => context.push('/similar?focus=$medicineId'),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.error.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Theme.of(context).colorScheme.error),
+                    ),
+                    child: Row(children: [
+                      Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error),
+                      const SizedBox(width: 10),
+                      Expanded(
+                          child: Text('Similar to ${mine.length} other medicine${mine.length == 1 ? '' : 's'} you '
+                              'registered. ${SimilarMedicineChecker.message}')),
+                    ]),
+                  ),
+                ),
+              );
+            }),
             const SizedBox(height: 12),
             if (m.sortedImages.isNotEmpty)
               SizedBox(
