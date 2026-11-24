@@ -14,10 +14,15 @@ class MedicinePhotoCaptureScreen extends ConsumerWidget {
   Future<void> _pick(BuildContext context, WidgetRef ref, ImageSlot slot, ImageSource src) async {
     final messenger = ScaffoldMessenger.of(context);
     try {
-      final x = await ImagePicker().pickImage(source: src, imageQuality: 92, maxWidth: 2400);
-      if (x == null) return;
+      final String? picked;
+      if (src == ImageSource.camera) {
+        picked = await context.push<String>('/camera');
+      } else {
+        picked = (await ImagePicker().pickImage(source: src, imageQuality: 92, maxWidth: 2400))?.path;
+      }
+      if (picked == null) return;
       final storage = ref.read(imageStorageProvider);
-      final staged = await storage.stage(x.path);
+      final staged = await storage.stage(picked);
       if (staged.path == null) {
         messenger.showSnackBar(SnackBar(content: Text(staged.problem ?? 'Photo rejected.')));
         return;
