@@ -7,20 +7,20 @@ import 'dose_repository.dart';
 import 'notification_gateway.dart';
 import 'reminder_service.dart';
 
-final notificationGatewayProvider =
+final Provider<NotificationGateway> notificationGatewayProvider =
     Provider<NotificationGateway>((ref) => LocalNotificationGateway());
 
-final doseRepositoryProvider =
+final Provider<DoseRepository> doseRepositoryProvider =
     Provider<DoseRepository>((ref) => DoseRepository(ref.watch(appDatabaseProvider)));
 
-final reminderServiceProvider = Provider<ReminderService>((ref) => ReminderService(
+final Provider<ReminderService> reminderServiceProvider = Provider<ReminderService>((ref) => ReminderService(
       doses: ref.watch(doseRepositoryProvider),
       gateway: ref.watch(notificationGatewayProvider),
     ));
 
 /// Starts the reminder engine once. Returns the dose id if the app was
 /// launched by tapping a reminder notification.
-final reminderBootProvider = FutureProvider<String?>((ref) async {
+final FutureProvider<String?> reminderBootProvider = FutureProvider<String?>((ref) async {
   final service = ref.read(reminderServiceProvider);
   service.onOpenDose = (id) => ref.read(routerProvider).push('/reminder/$id');
   await service.start();
