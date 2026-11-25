@@ -66,6 +66,17 @@ class DoseRepository {
     return (await q.get()).map(_item).toList();
   }
 
+  /// Pending doses whose time arrived within the last [within].
+  Future<List<DoseItem>> dueDoses(DateTime now, {Duration within = const Duration(minutes: 5)}) async {
+    final d = _db.doseHistoryEntries;
+    final q = _base()
+      ..where(d.status.equals('pending') &
+          d.scheduledAt.isSmallerOrEqualValue(now) &
+          d.scheduledAt.isBiggerThanValue(now.subtract(within)))
+      ..orderBy([OrderingTerm.asc(d.scheduledAt)]);
+    return (await q.get()).map(_item).toList();
+  }
+
   Future<Set<String>> snoozedDoseIds() async {
     final d = _db.doseHistoryEntries;
     final rows = await (_db.select(d)..where((t) => t.status.equals('snoozed'))).get();
