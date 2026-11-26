@@ -58,7 +58,6 @@ void main() {
   ScheduleDraft evening({bool enabled = true}) =>
       ScheduleDraft.create('s1', SchedulePeriod.night)
           .copyWith(dosage: '1 tablet', startDate: DateTime(2026, 1, 1), enabled: enabled);
-
   setUp(() async {
     db = AppDatabase(NativeDatabase.memory());
     meds = MedicineRepository(db, _NoImages());
