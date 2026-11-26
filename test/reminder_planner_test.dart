@@ -18,7 +18,6 @@ PlannerSchedule _s({
       startDate: start ?? DateTime(2026, 1, 1),
       endDate: end,
     );
-
 void main() {
   test('daily schedule yields one dose per day inside the window', () {
     final out = ReminderPlanner.plan([_s()],
