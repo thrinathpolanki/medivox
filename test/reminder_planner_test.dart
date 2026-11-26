@@ -25,7 +25,6 @@ void main() {
     expect(out.map((d) => d.scheduledAt),
         [DateTime(2026, 1, 15, 8), DateTime(2026, 1, 16, 8), DateTime(2026, 1, 17, 8)]);
   });
-
   test('start and end dates are inclusive', () {
     final out = ReminderPlanner.plan(
       [_s(start: DateTime(2026, 1, 16), end: DateTime(2026, 1, 17))],
