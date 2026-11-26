@@ -21,7 +21,6 @@ void main() {
       accessibility:
           const AccessibilitySettings(highContrast: true, fontScale: 1.4),
     ));
-
     final s = repo.load();
     expect(s.termsAcceptedAt, when);
     expect(s.storageMode, StorageMode.local);
