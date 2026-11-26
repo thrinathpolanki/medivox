@@ -16,7 +16,6 @@ void main() {
 
     FilledButton button() => tester.widget<FilledButton>(find.byType(FilledButton));
     expect(button().onPressed, isNull);
-
     await tester.tap(find.byType(CheckboxListTile));
     await tester.pump();
     expect(button().onPressed, isNotNull);
