@@ -87,7 +87,6 @@ void main() {
     await doses.reconcile(now: now);
     expect(await doses.getItem(firstDoseId), isNotNull);
   });
-
   test('unanswered doses become missed after 2 hours; nothing becomes taken', () async {
     await doses.reconcile(now: now);
     await doses.reconcile(now: DateTime(2026, 1, 16, 12));
