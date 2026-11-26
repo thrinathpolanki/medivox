@@ -88,7 +88,6 @@ void main() {
     expect(item.status, DoseStatus.missed);
     expect(item.dose.actionAt, isNull);
   });
-
   test('taken doses are never reverted by reconcile', () async {
     await doses.reconcile(now: now);
     await service.actions.taken(firstDoseId);
