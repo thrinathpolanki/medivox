@@ -46,7 +46,6 @@ class _FakeGateway implements NotificationGateway {
   @override
   Future<String?> launchDoseId() async => null;
 }
-
 void main() {
   late AppDatabase db;
   late MedicineRepository meds;
