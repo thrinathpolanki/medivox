@@ -22,7 +22,6 @@ class _NoImages implements ImageStorage {
   @override
   Future<void> discard(Iterable<String> p) async {}
 }
-
 class _FakeGateway implements NotificationGateway {
   final pending = <int, ScheduledReminder>{};
   @override
