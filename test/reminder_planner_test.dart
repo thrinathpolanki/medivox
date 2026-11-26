@@ -42,7 +42,6 @@ void main() {
         from: DateTime(2026, 1, 15), to: DateTime(2026, 1, 27));
     expect(out.map((d) => d.scheduledAt), [DateTime(2026, 1, 19, 8), DateTime(2026, 1, 26, 8)]);
   });
-
   test('window start is a real time: earlier slots today are excluded', () {
     final out = ReminderPlanner.plan([_s()],
         from: DateTime(2026, 1, 15, 9), to: DateTime(2026, 1, 16, 12));
