@@ -103,7 +103,6 @@ void main() {
     expect(r.body, contains('Paracetamol 500 mg'));
     expect(r.body, contains('1 tablet'));
   });
-
   test('snooze keeps its notification through a resync', () async {
     await service.resync(now: now);
     await service.actions.snooze(firstDoseId, now: now);
