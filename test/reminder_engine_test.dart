@@ -54,7 +54,6 @@ void main() {
   late ReminderService service;
   late String medicineId;
   final now = DateTime(2026, 1, 15, 9, 0);
-
   ScheduleDraft evening({bool enabled = true}) =>
       ScheduleDraft.create('s1', SchedulePeriod.night)
           .copyWith(dosage: '1 tablet', startDate: DateTime(2026, 1, 1), enabled: enabled);
