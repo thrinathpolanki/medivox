@@ -48,7 +48,6 @@ void main() {
         from: DateTime(2026, 1, 15, 9), to: DateTime(2026, 1, 16, 12));
     expect(out.map((d) => d.scheduledAt), [DateTime(2026, 1, 16, 8)]);
   });
-
   test('dose ids are deterministic', () {
     final a = ReminderPlanner.plan([_s()], from: DateTime(2026, 1, 15), to: DateTime(2026, 1, 16));
     final b = ReminderPlanner.plan([_s()], from: DateTime(2026, 1, 15), to: DateTime(2026, 1, 16));
