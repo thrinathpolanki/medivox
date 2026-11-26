@@ -9,7 +9,6 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final repo = SettingsRepository(await SharedPreferences.getInstance());
     expect(repo.load().storageMode, StorageMode.none);
-
     final when = DateTime.utc(2026, 1, 15, 8);
     await repo.save(AppSettings(
       termsAccepted: true,
