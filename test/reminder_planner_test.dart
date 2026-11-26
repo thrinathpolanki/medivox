@@ -35,7 +35,6 @@ void main() {
     expect(out.first.scheduledAt, DateTime(2026, 1, 16, 8));
     expect(out.last.scheduledAt, DateTime(2026, 1, 17, 8));
   });
-
   test('repeat days are respected (Mon=index 0)', () {
     // 2026-01-19 is a Monday.
     final mondays = [true, false, false, false, false, false, false];
