@@ -54,7 +54,6 @@ void main() {
     final b = ReminderPlanner.plan([_s()], from: DateTime(2026, 1, 15), to: DateTime(2026, 1, 16));
     expect(a.single.doseId, b.single.doseId);
   });
-
   test('notification ids are stable and positive 31-bit', () {
     final id = notificationIdFor('s1|1768464000');
     expect(id, notificationIdFor('s1|1768464000'));
