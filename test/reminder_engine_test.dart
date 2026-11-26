@@ -75,7 +75,6 @@ void main() {
   });
   tearDown(() => db.close());
   final firstDoseId = makeDoseId('s1', DateTime(2026, 1, 15, 20));
-
   test('reconcile creates future doses only and never past slots today', () async {
     await doses.reconcile(now: DateTime(2026, 1, 15, 21)); // after today's 20:00
     final today = await doses.getItem(firstDoseId);
